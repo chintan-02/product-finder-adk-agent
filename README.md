@@ -4,7 +4,7 @@ A lightweight Product Finder AI Agent built from the supplied 13-product JSON ca
 
 ## Current status
 
-Phases 0-9 are implemented:
+Phases 0-9 are complete and Phase 10 container configuration is implemented:
 
 - Assignment requirements verified against the original PDF
 - Repository foundation created
@@ -21,8 +21,12 @@ Phases 0-9 are implemented:
 - Custom React/Vite chatbot frontend added
 - Structured product cards and loading, error, empty, and image-fallback states added
 - Frontend API URL is environment-configurable for Cloud Run
+- Cloud Run-compatible backend Dockerfile and build exclusions added
+- Backend container runs as a non-root user and respects the injected `PORT`
+- Static container-contract tests added
 - A live Gemini invocation still requires `GOOGLE_API_KEY`
-- Docker and cloud deployment have not been added yet
+- Docker image execution remains to be verified on a machine with Docker
+- Cloud deployment has not started
 
 ## Source-of-truth requirement matrix
 
@@ -67,6 +71,8 @@ The agent interprets intent and constructs tool arguments. Python remains author
 
 ```text
 backend/
+  Dockerfile
+  .dockerignore
   app/
     data/products.json
     agent.py
@@ -143,6 +149,24 @@ npm run dev
 For deployment, set `VITE_API_URL` to the HTTPS Cloud Run backend URL before
 building the frontend. The browser never receives the Gemini API key.
 
+## Build and run the backend container
+
+From the repository root on Apple Silicon:
+
+```bash
+docker build --platform linux/amd64 -f backend/Dockerfile -t product-finder-api:local backend
+docker run --rm --name product-finder-api -p 8080:8080 --env-file backend/.env -e PORT=8080 product-finder-api:local
+```
+
+In a second terminal:
+
+```bash
+curl --fail http://localhost:8080/health
+```
+
+See `docs/containerization.md` for complete verification and troubleshooting
+commands.
+
 The deterministic layer supports:
 
 | Operator | Meaning | Natural-language example |
@@ -157,4 +181,4 @@ The PDF explicitly requires less than, greater than, and equal. Inclusive operat
 
 ## Next phase
 
-Containerize the FastAPI backend, run it locally through Docker, then deploy it to Cloud Run and configure the frontend build to call the deployed HTTPS URL.
+Verify the image with Docker on the MacBook, perform one live Gemini evaluation, then deploy the tested image to Cloud Run and configure the frontend to call its HTTPS URL.

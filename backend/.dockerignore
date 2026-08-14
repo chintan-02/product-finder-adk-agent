@@ -1,0 +1,16 @@
+.env
+.env.*
+!.env.example
+.git
+.gitignore
+.pytest_cache
+__pycache__
+*.py[cod]
+tests
+scripts
+.venv
+venv
+coverage.xml
+htmlcov
+*.log
+.DS_Store
