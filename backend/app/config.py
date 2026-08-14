@@ -6,7 +6,7 @@ import os
 from dataclasses import dataclass
 
 
-DEFAULT_AGENT_MODEL = "gemini-3.6-flash"
+DEFAULT_AGENT_MODEL = "gemini-3.5-flash-lite"
 DEFAULT_APP_NAME = "product_finder"
 
 
