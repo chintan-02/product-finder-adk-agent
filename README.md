@@ -4,7 +4,7 @@ A lightweight Product Finder AI Agent built from the supplied 13-product JSON ca
 
 ## Current status
 
-Phases 0-6 are implemented:
+Phases 0-8 are implemented:
 
 - Assignment requirements verified against the original PDF
 - Repository foundation created
@@ -15,8 +15,11 @@ Phases 0-6 are implemented:
 - Exactly one Google ADK agent configured with one deterministic function tool
 - Programmatic ADK runner and ephemeral session handling added
 - Credential-free agent configuration and tool tests added
+- FastAPI health and chat endpoints added
+- Request validation, request IDs, safe errors, and explicit CORS added
+- API tests use a dependency override and never call Gemini
 - A live Gemini invocation still requires `GOOGLE_API_KEY`
-- No FastAPI endpoint, frontend, or deployment code has been added yet
+- No frontend or deployment code has been added yet
 
 ## Source-of-truth requirement matrix
 
@@ -66,6 +69,7 @@ backend/
     agent.py
     agent_runtime.py
     config.py
+    main.py
     models.py
     product_service.py
   scripts/validate_catalogue.py
@@ -107,6 +111,18 @@ pip install -r backend/requirements.txt
 Copy `backend/.env.example` to `backend/.env` and replace the placeholder only
 when running a real Gemini request. The real key must never be committed.
 
+Run the API locally after configuring the environment:
+
+```bash
+uvicorn backend.app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+Useful endpoints:
+
+- `GET http://localhost:8000/health`
+- `POST http://localhost:8000/api/v1/chat`
+- `GET http://localhost:8000/docs` for generated OpenAPI documentation
+
 The deterministic layer supports:
 
 | Operator | Meaning | Natural-language example |
@@ -121,4 +137,4 @@ The PDF explicitly requires less than, greater than, and equal. Inclusive operat
 
 ## Next phase
 
-Expose the programmatic ADK runtime through a validated FastAPI endpoint, add safe error handling and CORS configuration, and test the API with a mocked agent runtime before spending tokens on live integration evaluation.
+Build the minimal custom React chatbot, connect it to this stable API contract, and render the returned structured products as responsive cards with loading, empty, error, and broken-image states.

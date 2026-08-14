@@ -82,3 +82,37 @@ class SearchResult(BaseModel):
         if self.count != len(self.products):
             raise ValueError("count must equal the number of products")
         return self
+
+
+class ChatRequest(BaseModel):
+    """Validated browser-to-backend chat request."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    message: str = Field(min_length=1, max_length=500)
+
+    @field_validator("message")
+    @classmethod
+    def trim_and_reject_blank_message(cls, value: str) -> str:
+        normalized = value.strip()
+        if not normalized:
+            raise ValueError("message must not be blank")
+        return normalized
+
+
+class ChatResponse(BaseModel):
+    """Stable response contract consumed by the custom frontend."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    message: str
+    products: tuple[Product, ...]
+    applied_filters: ProductFilters
+    count: int = Field(ge=0)
+    request_id: str
+
+    @model_validator(mode="after")
+    def count_must_match_products(self) -> "ChatResponse":
+        if self.count != len(self.products):
+            raise ValueError("count must equal the number of products")
+        return self
