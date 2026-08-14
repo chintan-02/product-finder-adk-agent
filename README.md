@@ -4,7 +4,7 @@ A lightweight Product Finder AI Agent built from the supplied 13-product JSON ca
 
 ## Current status
 
-Phases 0-8 are implemented:
+Phases 0-9 are implemented:
 
 - Assignment requirements verified against the original PDF
 - Repository foundation created
@@ -18,8 +18,11 @@ Phases 0-8 are implemented:
 - FastAPI health and chat endpoints added
 - Request validation, request IDs, safe errors, and explicit CORS added
 - API tests use a dependency override and never call Gemini
+- Custom React/Vite chatbot frontend added
+- Structured product cards and loading, error, empty, and image-fallback states added
+- Frontend API URL is environment-configurable for Cloud Run
 - A live Gemini invocation still requires `GOOGLE_API_KEY`
-- No frontend or deployment code has been added yet
+- Docker and cloud deployment have not been added yet
 
 ## Source-of-truth requirement matrix
 
@@ -75,6 +78,11 @@ backend/
   scripts/validate_catalogue.py
   tests/
 frontend/
+  src/
+    components/
+    App.jsx
+    api.js
+    styles.css
 docs/
 ```
 
@@ -123,6 +131,18 @@ Useful endpoints:
 - `POST http://localhost:8000/api/v1/chat`
 - `GET http://localhost:8000/docs` for generated OpenAPI documentation
 
+Run the frontend locally in a second terminal:
+
+```bash
+cd frontend
+cp .env.example .env
+npm install
+npm run dev
+```
+
+For deployment, set `VITE_API_URL` to the HTTPS Cloud Run backend URL before
+building the frontend. The browser never receives the Gemini API key.
+
 The deterministic layer supports:
 
 | Operator | Meaning | Natural-language example |
@@ -137,4 +157,4 @@ The PDF explicitly requires less than, greater than, and equal. Inclusive operat
 
 ## Next phase
 
-Build the minimal custom React chatbot, connect it to this stable API contract, and render the returned structured products as responsive cards with loading, empty, error, and broken-image states.
+Containerize the FastAPI backend, run it locally through Docker, then deploy it to Cloud Run and configure the frontend build to call the deployed HTTPS URL.
