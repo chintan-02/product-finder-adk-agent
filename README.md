@@ -4,7 +4,7 @@ A lightweight Product Finder AI Agent built from the supplied 13-product JSON ca
 
 ## Current status
 
-Phases 0-4 are complete:
+Phases 0-6 are implemented:
 
 - Assignment requirements verified against the original PDF
 - Repository foundation created
@@ -12,7 +12,11 @@ Phases 0-4 are complete:
 - Typed product, filter, and search-result contracts added
 - Deterministic category, price, and optional text filtering implemented
 - Boundary and validation tests added
-- No agent, API, frontend, or deployment code has been added yet
+- Exactly one Google ADK agent configured with one deterministic function tool
+- Programmatic ADK runner and ephemeral session handling added
+- Credential-free agent configuration and tool tests added
+- A live Gemini invocation still requires `GOOGLE_API_KEY`
+- No FastAPI endpoint, frontend, or deployment code has been added yet
 
 ## Source-of-truth requirement matrix
 
@@ -59,6 +63,9 @@ The agent interprets intent and constructs tool arguments. Python remains author
 backend/
   app/
     data/products.json
+    agent.py
+    agent_runtime.py
+    config.py
     models.py
     product_service.py
   scripts/validate_catalogue.py
@@ -89,6 +96,17 @@ From the repository root:
 python3 -m unittest discover -s backend/tests -v
 ```
 
+Install dependencies first in a virtual environment:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r backend/requirements.txt
+```
+
+Copy `backend/.env.example` to `backend/.env` and replace the placeholder only
+when running a real Gemini request. The real key must never be committed.
+
 The deterministic layer supports:
 
 | Operator | Meaning | Natural-language example |
@@ -103,4 +121,4 @@ The PDF explicitly requires less than, greater than, and equal. Inclusive operat
 
 ## Next phase
 
-Learn the Google ADK execution model, verify the current official API, and connect exactly one agent to this tested search service.
+Expose the programmatic ADK runtime through a validated FastAPI endpoint, add safe error handling and CORS configuration, and test the API with a mocked agent runtime before spending tokens on live integration evaluation.

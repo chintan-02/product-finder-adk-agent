@@ -1,1 +1,2 @@
+google-adk>=2.7,<3.0
 pydantic>=2.12,<3.0
