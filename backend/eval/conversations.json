@@ -1,0 +1,604 @@
+{
+  "walkthrough": [
+    {
+      "message": "Find a black waterproof jacket under $150.",
+      "patch": {
+        "category": "clothing",
+        "search_text": "jacket",
+        "color": "black",
+        "waterproof": true,
+        "max_price": 150
+      },
+      "filters": {
+        "category": "clothing",
+        "search_text": "jacket",
+        "color": "black",
+        "waterproof": true,
+        "max_price": 150
+      },
+      "ids": [
+        100,
+        102
+      ]
+    },
+    {
+      "message": "Make that under $100.",
+      "patch": {
+        "max_price": 100
+      },
+      "filters": {
+        "category": "clothing",
+        "search_text": "jacket",
+        "color": "black",
+        "waterproof": true,
+        "max_price": 100
+      },
+      "ids": [
+        100
+      ]
+    },
+    {
+      "message": "Any colour is fine.",
+      "patch": {
+        "clear": [
+          "color"
+        ]
+      },
+      "filters": {
+        "category": "clothing",
+        "search_text": "jacket",
+        "waterproof": true,
+        "max_price": 100
+      },
+      "ids": [
+        100,
+        101
+      ]
+    },
+    {
+      "message": "Only show size XL.",
+      "patch": {
+        "size": "XL"
+      },
+      "filters": {
+        "category": "clothing",
+        "search_text": "jacket",
+        "waterproof": true,
+        "max_price": 100,
+        "size": "XL"
+      },
+      "ids": [],
+      "offer": "Raise budget to $115"
+    },
+    {
+      "message": "Okay, go up to $130.",
+      "patch": {
+        "max_price": 130
+      },
+      "filters": {
+        "category": "clothing",
+        "search_text": "jacket",
+        "waterproof": true,
+        "max_price": 130,
+        "size": "XL"
+      },
+      "ids": [
+        102,
+        103
+      ]
+    }
+  ],
+  "accept_budget_offer": [
+    {
+      "message": "Find a black waterproof jacket under $150.",
+      "patch": {
+        "category": "clothing",
+        "search_text": "jacket",
+        "color": "black",
+        "waterproof": true,
+        "max_price": 150
+      },
+      "filters": {
+        "category": "clothing",
+        "search_text": "jacket",
+        "color": "black",
+        "waterproof": true,
+        "max_price": 150
+      },
+      "ids": [
+        100,
+        102
+      ]
+    },
+    {
+      "message": "Make that under $100.",
+      "patch": {
+        "max_price": 100
+      },
+      "filters": {
+        "category": "clothing",
+        "search_text": "jacket",
+        "color": "black",
+        "waterproof": true,
+        "max_price": 100
+      },
+      "ids": [
+        100
+      ]
+    },
+    {
+      "message": "Any colour is fine.",
+      "patch": {
+        "clear": [
+          "color"
+        ]
+      },
+      "filters": {
+        "category": "clothing",
+        "search_text": "jacket",
+        "waterproof": true,
+        "max_price": 100
+      },
+      "ids": [
+        100,
+        101
+      ]
+    },
+    {
+      "message": "Only show size XL.",
+      "patch": {
+        "size": "XL"
+      },
+      "filters": {
+        "category": "clothing",
+        "search_text": "jacket",
+        "waterproof": true,
+        "max_price": 100,
+        "size": "XL"
+      },
+      "ids": [],
+      "offer": "Raise budget to $115"
+    },
+    {
+      "message": "Okay.",
+      "patch": {
+        "accept_relaxation": true
+      },
+      "filters": {
+        "category": "clothing",
+        "search_text": "jacket",
+        "waterproof": true,
+        "max_price": 115,
+        "size": "XL"
+      },
+      "ids": [
+        102
+      ]
+    }
+  ],
+  "budget_down": [
+    {
+      "message": "Find a black waterproof jacket under $150.",
+      "patch": {
+        "category": "clothing",
+        "search_text": "jacket",
+        "color": "black",
+        "waterproof": true,
+        "max_price": 150
+      },
+      "filters": {
+        "category": "clothing",
+        "search_text": "jacket",
+        "color": "black",
+        "waterproof": true,
+        "max_price": 150
+      },
+      "ids": [
+        100,
+        102
+      ]
+    },
+    {
+      "message": "Make that under $100.",
+      "patch": {
+        "max_price": 100
+      },
+      "filters": {
+        "category": "clothing",
+        "search_text": "jacket",
+        "color": "black",
+        "waterproof": true,
+        "max_price": 100
+      },
+      "ids": [
+        100
+      ]
+    }
+  ],
+  "budget_up": [
+    {
+      "message": "Find a black waterproof jacket under $150.",
+      "patch": {
+        "category": "clothing",
+        "search_text": "jacket",
+        "color": "black",
+        "waterproof": true,
+        "max_price": 150
+      },
+      "filters": {
+        "category": "clothing",
+        "search_text": "jacket",
+        "color": "black",
+        "waterproof": true,
+        "max_price": 150
+      },
+      "ids": [
+        100,
+        102
+      ]
+    },
+    {
+      "message": "Make that under $100.",
+      "patch": {
+        "max_price": 100
+      },
+      "filters": {
+        "category": "clothing",
+        "search_text": "jacket",
+        "color": "black",
+        "waterproof": true,
+        "max_price": 100
+      },
+      "ids": [
+        100
+      ]
+    },
+    {
+      "message": "Raise the budget to $150.",
+      "patch": {
+        "max_price": 150
+      },
+      "filters": {
+        "category": "clothing",
+        "search_text": "jacket",
+        "color": "black",
+        "waterproof": true,
+        "max_price": 150
+      },
+      "ids": [
+        100,
+        102
+      ]
+    }
+  ],
+  "clear_colour": [
+    {
+      "message": "Find a black waterproof jacket under $150.",
+      "patch": {
+        "category": "clothing",
+        "search_text": "jacket",
+        "color": "black",
+        "waterproof": true,
+        "max_price": 150
+      },
+      "filters": {
+        "category": "clothing",
+        "search_text": "jacket",
+        "color": "black",
+        "waterproof": true,
+        "max_price": 150
+      },
+      "ids": [
+        100,
+        102
+      ]
+    },
+    {
+      "message": "Make that under $100.",
+      "patch": {
+        "max_price": 100
+      },
+      "filters": {
+        "category": "clothing",
+        "search_text": "jacket",
+        "color": "black",
+        "waterproof": true,
+        "max_price": 100
+      },
+      "ids": [
+        100
+      ]
+    },
+    {
+      "message": "Any colour is fine.",
+      "patch": {
+        "clear": [
+          "color"
+        ]
+      },
+      "filters": {
+        "category": "clothing",
+        "search_text": "jacket",
+        "waterproof": true,
+        "max_price": 100
+      },
+      "ids": [
+        100,
+        101
+      ]
+    }
+  ],
+  "clear_budget": [
+    {
+      "message": "Find a black waterproof jacket under $150.",
+      "patch": {
+        "category": "clothing",
+        "search_text": "jacket",
+        "color": "black",
+        "waterproof": true,
+        "max_price": 150
+      },
+      "filters": {
+        "category": "clothing",
+        "search_text": "jacket",
+        "color": "black",
+        "waterproof": true,
+        "max_price": 150
+      },
+      "ids": [
+        100,
+        102
+      ]
+    },
+    {
+      "message": "Remove the price limit.",
+      "patch": {
+        "clear": [
+          "price"
+        ]
+      },
+      "filters": {
+        "category": "clothing",
+        "search_text": "jacket",
+        "color": "black",
+        "waterproof": true
+      },
+      "ids": [
+        100,
+        102
+      ]
+    }
+  ],
+  "reset": [
+    {
+      "message": "Find a black waterproof jacket under $150.",
+      "patch": {
+        "category": "clothing",
+        "search_text": "jacket",
+        "color": "black",
+        "waterproof": true,
+        "max_price": 150
+      },
+      "filters": {
+        "category": "clothing",
+        "search_text": "jacket",
+        "color": "black",
+        "waterproof": true,
+        "max_price": 150
+      },
+      "ids": [
+        100,
+        102
+      ]
+    },
+    {
+      "message": "Start over and show everything.",
+      "patch": {
+        "reset": true
+      },
+      "filters": {},
+      "ids": [
+        100,
+        101,
+        102,
+        103
+      ]
+    }
+  ],
+  "ambiguity": [
+    {
+      "message": "Find a black waterproof jacket under $150.",
+      "patch": {
+        "category": "clothing",
+        "search_text": "jacket",
+        "color": "black",
+        "waterproof": true,
+        "max_price": 150
+      },
+      "filters": {
+        "category": "clothing",
+        "search_text": "jacket",
+        "color": "black",
+        "waterproof": true,
+        "max_price": 150
+      },
+      "ids": [
+        100,
+        102
+      ]
+    },
+    {
+      "message": "Something cheaper.",
+      "patch": {
+        "clarify": true
+      },
+      "filters": {
+        "category": "clothing",
+        "search_text": "jacket",
+        "color": "black",
+        "waterproof": true,
+        "max_price": 150
+      },
+      "ids": [
+        100,
+        102
+      ],
+      "clarification": true
+    }
+  ],
+  "blue_synonym": [
+    {
+      "message": "Show navy jackets.",
+      "patch": {
+        "color": "navy",
+        "search_text": "jacket"
+      },
+      "filters": {
+        "color": "blue",
+        "search_text": "jacket"
+      },
+      "ids": [
+        101
+      ]
+    }
+  ],
+  "inclusive_max": [
+    {
+      "message": "Show jackets at most $85.",
+      "patch": {
+        "max_price": 85,
+        "search_text": "jacket"
+      },
+      "filters": {
+        "max_price": 85,
+        "search_text": "jacket"
+      },
+      "ids": [
+        100
+      ],
+      "equivalent": {
+        "price_operator": "lte",
+        "price_value": 85,
+        "search_text": "jacket"
+      }
+    }
+  ],
+  "price_range": [
+    {
+      "message": "Show jackets between $95 and $115 inclusive.",
+      "patch": {
+        "min_price": 95,
+        "max_price": 115,
+        "search_text": "jacket"
+      },
+      "filters": {
+        "min_price": 95,
+        "max_price": 115,
+        "search_text": "jacket"
+      },
+      "ids": [
+        101,
+        102
+      ]
+    }
+  ],
+  "size_then_clear": [
+    {
+      "message": "Find a black waterproof jacket under $150.",
+      "patch": {
+        "category": "clothing",
+        "search_text": "jacket",
+        "color": "black",
+        "waterproof": true,
+        "max_price": 150
+      },
+      "filters": {
+        "category": "clothing",
+        "search_text": "jacket",
+        "color": "black",
+        "waterproof": true,
+        "max_price": 150
+      },
+      "ids": [
+        100,
+        102
+      ]
+    },
+    {
+      "message": "Only XL.",
+      "patch": {
+        "size": "XL"
+      },
+      "filters": {
+        "category": "clothing",
+        "search_text": "jacket",
+        "color": "black",
+        "waterproof": true,
+        "max_price": 150,
+        "size": "XL"
+      },
+      "ids": [
+        102
+      ]
+    },
+    {
+      "message": "Any size is fine.",
+      "patch": {
+        "clear": [
+          "size"
+        ]
+      },
+      "filters": {
+        "category": "clothing",
+        "search_text": "jacket",
+        "color": "black",
+        "waterproof": true,
+        "max_price": 150
+      },
+      "ids": [
+        100,
+        102
+      ]
+    }
+  ],
+  "waterproof_false": [
+    {
+      "message": "Show jackets that are not waterproof.",
+      "patch": {
+        "search_text": "jacket",
+        "waterproof": false
+      },
+      "filters": {
+        "search_text": "jacket",
+        "waterproof": false
+      },
+      "ids": []
+    }
+  ],
+  "impossible_category": [
+    {
+      "message": "Show furniture.",
+      "patch": {
+        "category": "furniture"
+      },
+      "filters": {
+        "category": "furniture"
+      },
+      "ids": []
+    }
+  ],
+  "outside_catalogue": [
+    {
+      "message": "Show red jackets.",
+      "patch": {
+        "color": "red",
+        "search_text": "jacket"
+      },
+      "filters": {
+        "color": "red",
+        "search_text": "jacket"
+      },
+      "ids": []
+    }
+  ]
+}

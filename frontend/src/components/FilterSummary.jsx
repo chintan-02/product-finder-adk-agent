@@ -18,6 +18,11 @@ export default function FilterSummary({ filters }) {
       ).toLocaleString()}`,
     );
   }
+  if (filters.color) labels.push(filters.color);
+  if (filters.size) labels.push(`size ${filters.size}`);
+  if (filters.waterproof != null) labels.push(filters.waterproof ? "waterproof" : "non-waterproof");
+  if (filters.max_price != null) labels.push(`at most $${filters.max_price}`);
+  if (filters.min_price != null) labels.push(`at least $${filters.min_price}`);
   if (filters.search_text) labels.push(`matching “${filters.search_text}”`);
 
   if (labels.length === 0) {
