@@ -5,6 +5,14 @@ import ChatInput from "./components/ChatInput";
 import FilterSummary from "./components/FilterSummary";
 import ProductGrid from "./components/ProductGrid";
 
+const DEMO_START = "Find a black waterproof jacket under $150";
+const DEMO_FOLLOW_UPS = [
+  "Make that under $100",
+  "Any colour is fine",
+  "Only show size XL",
+  "Okay, go up to $130",
+];
+
 const EXAMPLE_QUERIES = [
   "Show all clothing products",
   "Electronics over $200",
@@ -18,27 +26,36 @@ export default function App() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [demoCatalogue, setDemoCatalogue] = useState(false);
   const activeRequest = useRef(null);
+  const lastOptions = useRef({});
 
   useEffect(() => () => activeRequest.current?.abort(), []);
 
-  async function runSearch(rawQuery) {
+  async function runSearch(rawQuery, { fresh = false, accept = false, demo = demoCatalogue } = {}) {
     const normalizedQuery = rawQuery.trim();
     if (!normalizedQuery || isLoading) return;
 
+    lastOptions.current = { fresh, accept, demo };
     activeRequest.current?.abort();
     const controller = new AbortController();
     activeRequest.current = controller;
 
     setSubmittedQuery(normalizedQuery);
     setQuery(normalizedQuery);
-    setResult(null);
     setError("");
     setIsLoading(true);
 
     try {
-      const payload = await searchProducts(normalizedQuery, controller.signal);
-      setResult(payload);
+      const payload = await searchProducts(normalizedQuery, controller.signal, {
+        active_filters: fresh ? null : result?.applied_filters ?? null,
+        demo_catalogue: demo,
+        accept_relaxation: accept,
+      });
+      if (activeRequest.current === controller) {
+        setDemoCatalogue(demo);
+        setResult(payload);
+      }
     } catch (requestError) {
       if (requestError.name !== "AbortError") {
         setError(requestError.message || "Unable to connect to the product service.");
@@ -61,6 +78,7 @@ export default function App() {
     activeRequest.current = null;
     setQuery("");
     setSubmittedQuery("");
+    setDemoCatalogue(false);
     setResult(null);
     setError("");
     setIsLoading(false);
@@ -106,10 +124,23 @@ export default function App() {
                   className="example-chip"
                   key={example}
                   disabled={isLoading}
-                  onClick={() => runSearch(example)}
+                  onClick={() => runSearch(example, { fresh: true, demo: false })}
                 >
                   {example}
                 </button>
+              ))}
+            </div>
+          </div>
+          <div className="example-row" aria-label="Sample jacket walkthrough">
+            <span>Sample jacket catalogue</span>
+            <div>
+              <button type="button" className="example-chip" disabled={isLoading}
+                onClick={() => runSearch(DEMO_START, { fresh: true, demo: true })}>
+                Start walkthrough
+              </button>
+              {demoCatalogue && result && DEMO_FOLLOW_UPS.map((step) => (
+                <button type="button" className="example-chip" key={step}
+                  disabled={isLoading} onClick={() => runSearch(step)}>{step}</button>
               ))}
             </div>
           </div>
@@ -134,11 +165,11 @@ export default function App() {
               <strong>Search unavailable</strong>
               <p>{error}</p>
             </div>
-            <button type="button" onClick={() => runSearch(submittedQuery)}>Try again</button>
+            <button type="button" onClick={() => runSearch(submittedQuery, lastOptions.current)}>Try again</button>
           </div>
         )}
 
-        {result && (
+        {result && !isLoading && !error && (
           <>
             <div className="conversation">
               <div className="message user-message">
@@ -157,7 +188,7 @@ export default function App() {
             <div className="results-header">
               <div>
                 <p className="section-kicker">Search results</p>
-                <h2>{result.count} {result.count === 1 ? "product" : "products"} found</h2>
+                <h2>{result.clarification ? "Clarify your request" : `${result.count} ${result.count === 1 ? "product" : "products"} found`}</h2>
               </div>
               <button className="clear-button" type="button" onClick={clearSearch}>Clear search</button>
             </div>
@@ -169,8 +200,13 @@ export default function App() {
               <div className="state-card empty-state">
                 <span aria-hidden="true">⌕</span>
                 <div>
-                  <strong>No matching products</strong>
-                  <p>Try changing the category, price, or product wording.</p>
+                  <strong>{result.clarification ? "Search unchanged" : "0 exact matches"}</strong>
+                  {result.relaxation_offer ? (
+                    <button type="button" className="example-chip"
+                      onClick={() => runSearch("Yes, apply the offered budget change", { accept: true })}>
+                      {result.relaxation_offer}
+                    </button>
+                  ) : <p>Try changing a filter or starting over.</p>}
                 </div>
               </div>
             )}

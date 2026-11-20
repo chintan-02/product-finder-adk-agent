@@ -12,9 +12,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 
-from .agent_runtime import ProductAgentRuntime
+from .agent_runtime import AgentExecutionResult, ProductAgentRuntime
+from .conversation import budget_offer, search
 from .config import Settings
-from .models import ChatRequest, ChatResponse, SearchResult
+from .models import ChatRequest, ChatResponse, ProductFilters, SearchResult
 
 
 LOGGER = logging.getLogger("product_finder.api")
@@ -109,8 +110,23 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         request: Request,
         runtime: ProductAgentRuntime = Depends(get_runtime),
     ) -> ChatResponse:
+        started = perf_counter()
+        previous = payload.active_filters or ProductFilters()
         try:
-            execution = await runtime.run(payload.message)
+            if payload.accept_relaxation:
+                current = search(previous, payload.demo_catalogue)
+                offer = budget_offer(previous, payload.demo_catalogue) if not current.count else None
+                result = offer[1] if offer else current
+                message = f"{result.count} exact matches." if offer else "There is no budget change to apply."
+                execution = AgentExecutionResult(message, {
+                    "status": "success", **result.model_dump(mode="json"),
+                })
+            elif payload.active_filters is not None or payload.demo_catalogue:
+                execution = await runtime.run(
+                    payload.message, filters=previous, demo=payload.demo_catalogue,
+                )
+            else:
+                execution = await runtime.run(payload.message)
         except Exception as exc:
             raise AgentUpstreamError("ADK invocation failed") from exc
 
@@ -129,12 +145,26 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         except ValidationError as exc:
             raise AgentUpstreamError("Agent returned malformed tool output") from exc
 
+        clarification = bool(tool_payload.get("clarification", False))
+        offer = budget_offer(result.applied_filters, payload.demo_catalogue) if not result.count and not clarification else None
+        total_ms = (perf_counter() - started) * 1000
+        tool_ms = tool_payload.get("tool_ms")
+        agent_ms = round(max(0, total_ms - tool_ms), 2) if isinstance(tool_ms, (float, int)) else None
+        LOGGER.info(
+            "search_turn request_id=%s follow_up=%s total_ms=%.2f agent_ms=%s tool_ms=%s count=%s clarification=%s updated=%s cleared=%s reset=%s",
+            request.state.request_id, payload.active_filters is not None,
+            total_ms, agent_ms, tool_ms, result.count, clarification,
+            tool_payload.get("updated_fields"), tool_payload.get("cleared_fields"),
+            tool_payload.get("reset"),
+        )
         return ChatResponse(
             message=execution.message,
             products=result.products,
             applied_filters=result.applied_filters,
             count=result.count,
             request_id=request.state.request_id,
+            clarification=clarification,
+            relaxation_offer=offer[0] if offer else None,
         )
 
     return app

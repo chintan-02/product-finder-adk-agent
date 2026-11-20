@@ -28,6 +28,9 @@ class Product(BaseModel):
     description: str = Field(min_length=1)
     price: float = Field(ge=0)
     image: HttpUrl
+    color: str | None = None
+    sizes: tuple[str, ...] = ()
+    waterproof: bool | None = None
 
     @field_validator("name", "category", "description")
     @classmethod
@@ -46,8 +49,29 @@ class ProductFilters(BaseModel):
 
     category: str | None = None
     price_operator: PriceOperator | None = None
-    price_value: float | None = Field(default=None, ge=0)
+    price_value: float | None = Field(default=None, ge=0, allow_inf_nan=False)
     search_text: str | None = None
+    color: str | None = None
+    size: str | None = None
+    waterproof: bool | None = None
+    max_price: float | None = Field(default=None, ge=0, allow_inf_nan=False)
+    min_price: float | None = Field(default=None, ge=0, allow_inf_nan=False)
+
+    @field_validator("color", "size")
+    @classmethod
+    def normalize_attribute(cls, value: str | None, info) -> str | None:
+        if value is None:
+            return None
+        if info.field_name == "size":
+            size = value.strip().upper()
+            if size not in {"XS", "S", "M", "L", "XL", "XXL"}:
+                raise ValueError("unsupported size")
+            return size
+        color = value.strip().casefold()
+        color = {"navy": "blue", "gray": "grey", "charcoal": "grey"}.get(color, color)
+        if color not in {"black", "blue", "red", "green", "grey", "white", "brown"}:
+            raise ValueError("unsupported colour")
+        return color
 
     @field_validator("category", "search_text")
     @classmethod
@@ -65,6 +89,9 @@ class ProductFilters(BaseModel):
         has_value = self.price_value is not None
         if has_operator != has_value:
             raise ValueError("price_operator and price_value must be supplied together")
+        if self.min_price is not None and self.max_price is not None:
+            if self.min_price > self.max_price:
+                raise ValueError("minimum price exceeds maximum price")
         return self
 
 
@@ -90,6 +117,9 @@ class ChatRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     message: str = Field(min_length=1, max_length=500)
+    active_filters: ProductFilters | None = None
+    demo_catalogue: bool = False
+    accept_relaxation: bool = False
 
     @field_validator("message")
     @classmethod
@@ -110,6 +140,8 @@ class ChatResponse(BaseModel):
     applied_filters: ProductFilters
     count: int = Field(ge=0)
     request_id: str
+    clarification: bool = False
+    relaxation_offer: str | None = None
 
     @model_validator(mode="after")
     def count_must_match_products(self) -> "ChatResponse":

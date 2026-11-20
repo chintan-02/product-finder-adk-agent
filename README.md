@@ -8,7 +8,7 @@ A lightweight, full-stack Product Finder built with one Google Agent Development
 - Cloud Run health: https://product-finder-api-688514789228.us-west1.run.app/health
 - API documentation: https://product-finder-api-688514789228.us-west1.run.app/docs
 
-## Final status
+## Original live release
 
 The assignment implementation is complete:
 
@@ -23,6 +23,45 @@ The assignment implementation is complete:
 - The frontend is deployed to Netlify and calls Cloud Run directly.
 - The Gemini API key is stored in Google Secret Manager and is never sent to the browser.
 
+## Conversational search
+
+Use **Start walkthrough** to switch from the original 13 products to the
+labelled sample jacket catalogue. Try the suggested follow-ups in order.
+
+| Turn | Expected result |
+|---|---|
+| Find a black waterproof jacket under $150 | Sample Trail and Summit |
+| Make that under $100 | Trail, with black and waterproof preserved |
+| Any colour is fine | Trail and Ridge, still waterproof and within budget |
+| Only show size XL | Zero exact matches and an offer to raise the budget to $115 |
+| Okay, go up to $130 | Summit and Coast, still waterproof and XL |
+
+React sends the previous validated filters with each follow-up. ADK translates
+the new message to a patch. The backend validates the merged filters and builds
+cards from catalogue data. An omitted filter is preserved, an explicit clear
+removes it, and reset starts fresh. The budget offer is the lowest price that
+restores a match while preserving the other filters. Applying it requires
+confirmation. The API has no shared conversation storage between requests.
+
+The original catalogue keeps its strict price operators. The sample jacket
+walkthrough treats the stated budget as an inclusive cap. Sample listings
+are fictional and independent of the original catalogue.
+
+### Evaluation
+
+```bash
+python -m unittest discover -s backend/tests -v
+python -m backend.eval.run_live http://localhost:8000 --runs 5
+python -m backend.eval.run_live https://product-finder-api-688514789228.us-west1.run.app --case walkthrough --runs 5
+```
+
+Local checks passed 49 tests, including 15 scripted conversations through
+the real ADK runner with a scripted model, plus simultaneous search isolation.
+The frontend production build passed. The live evaluator uses the deployed
+model and reports filter, result and clarification checks, filter compliance
+of the returned cards, first-turn and follow-up p50/p95 latency, and failing
+turns. Live Gemini results are pending deployment of the conversational API.
+
 ## Architecture
 
 ```text
@@ -33,7 +72,7 @@ User
   -> one Google ADK product_finder_agent
   -> find_products structured function tool
   -> deterministic Python filtering
-  -> supplied products.json catalogue
+  -> supplied products.json or explicit sample jacket catalogue
   -> structured result returned to React product cards
 ```
 
@@ -244,7 +283,7 @@ Publish directory: dist
 - **Deterministic filtering:** avoids asking an LLM to perform authoritative numeric comparisons.
 - **Structured API response:** product cards use validated tool data instead of extracting facts from generated text.
 - **Fixed JSON catalogue:** appropriate for the supplied 13-item prototype and requires no database.
-- **In-memory ADK sessions:** sufficient because every search is independent; sessions are not durable across instances.
+- **Request-scoped ADK sessions:** each request loads its prior validated filters and deletes its temporary ADK session afterward. Browser-held filters survive backend instance changes but reset when the page reloads.
 - **Scale to zero:** reduces demo cost but can introduce a cold-start delay on the first request.
 - **Public demo endpoint:** enables direct browser access; maximum instances and billing alerts reduce cost exposure, but this is not an authenticated production commerce API.
 - **External image URLs:** preserved from the assignment dataset. The UI provides an image-unavailable fallback when a source blocks hotlinking or becomes unavailable.
@@ -268,7 +307,7 @@ Adding these features would increase cost and complexity without improving compl
 
 ## Known limitations
 
-- Product availability and facts are limited to the supplied static catalogue.
+- Product availability and facts are limited to the supplied catalogue or the explicitly selected sample catalogue.
 - The API depends on Gemini availability and free-tier rate limits.
 - Scale-to-zero can make the first request slower.
 - Some third-party image hosts may block embedded images.

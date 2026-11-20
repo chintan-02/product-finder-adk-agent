@@ -45,6 +45,11 @@ def search_products(
     price_value: float | None = None,
     search_text: str | None = None,
     products: Iterable[Product] | None = None,
+    color: str | None = None,
+    size: str | None = None,
+    waterproof: bool | None = None,
+    min_price: float | None = None,
+    max_price: float | None = None,
 ) -> SearchResult:
     """Apply validated filters in a deterministic, linear scan.
 
@@ -57,6 +62,11 @@ def search_products(
         price_operator=price_operator,
         price_value=price_value,
         search_text=search_text,
+        color=color,
+        size=size,
+        waterproof=waterproof,
+        min_price=min_price,
+        max_price=max_price,
     )
     catalogue = tuple(products) if products is not None else load_products()
 
@@ -75,6 +85,16 @@ def search_products(
             if filters.search_text not in searchable_text:
                 continue
 
+        if filters.color and filters.color != product.color:
+            continue
+        if filters.size and filters.size not in product.sizes:
+            continue
+        if filters.waterproof is not None and filters.waterproof != product.waterproof:
+            continue
+        if filters.min_price is not None and product.price < filters.min_price:
+            continue
+        if filters.max_price is not None and product.price > filters.max_price:
+            continue
         matches.append(product)
 
     return SearchResult(

@@ -6,10 +6,10 @@ export default function ProductCard({ product }) {
   return (
     <article className="product-card">
       <div className="product-image-wrap">
-        {imageFailed ? (
+        {imageFailed || product.color ? (
           <div className="image-fallback" role="img" aria-label={`${product.name} image unavailable`}>
             <span aria-hidden="true">◇</span>
-            <small>Image unavailable</small>
+            <small>{product.color ? "Sample product" : "Image unavailable"}</small>
           </div>
         ) : (
           <img
@@ -28,6 +28,7 @@ export default function ProductCard({ product }) {
           <strong>${Number(product.price).toLocaleString()}</strong>
         </div>
         <p>{product.description}</p>
+        {product.color && <p>{product.color} · Sizes {product.sizes.join(", ")}</p>}
       </div>
     </article>
   );
