@@ -1,6 +1,18 @@
 import { useState } from "react";
 
+import { browseCategory } from "../catalogueExamples";
+
+const cataloguePhotos = {
+  0: "hoodie",
+  6: "backpack",
+  7: "t-shirt",
+  8: "denim-jacket",
+  9: "apples",
+  12: "brown-rice",
+};
+
 export default function ProductCard({ product }) {
+  const photo = cataloguePhotos[product.id];
   const [imageFailed, setImageFailed] = useState(false);
 
   return (
@@ -14,13 +26,13 @@ export default function ProductCard({ product }) {
         ) : (
           <img
             className="product-image"
-            src={product.image}
+            src={photo ? `/catalogue/${photo}.webp` : product.image}
             alt={product.name}
             loading="lazy"
             onError={() => setImageFailed(true)}
           />
         )}
-        <span className="category-badge">{product.category}</span>
+        <span className="category-badge">{browseCategory(product)}</span>
       </div>
       <div className="product-content">
         <div className="product-heading">

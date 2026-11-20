@@ -11,7 +11,7 @@ export default function FilterSummary({ filters }) {
 
   const labels = [];
   if (filters.category) labels.push(filters.category);
-  if (filters.price_operator && filters.price_value !== null) {
+  if (filters.price_operator && filters.price_value != null) {
     labels.push(
       `${OPERATOR_LABELS[filters.price_operator] || filters.price_operator} $${Number(
         filters.price_value,

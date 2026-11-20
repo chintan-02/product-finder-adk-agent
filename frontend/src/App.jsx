@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import { searchProducts } from "./api";
+import { EXAMPLE_QUERIES, findCatalogueExample, visibleSearchResult } from "./catalogueExamples";
 import ChatInput from "./components/ChatInput";
 import FilterSummary from "./components/FilterSummary";
 import ProductGrid from "./components/ProductGrid";
@@ -11,13 +12,6 @@ const DEMO_FOLLOW_UPS = [
   "Any colour is fine.",
   "Only show size XL.",
   "Okay, go up to $130.",
-];
-
-const EXAMPLE_QUERIES = [
-  "Show all clothing products",
-  "Electronics over $200",
-  "Products exactly $49",
-  "Groceries at most $5",
 ];
 
 export default function App() {
@@ -47,14 +41,15 @@ export default function App() {
     setIsLoading(true);
 
     try {
-      const payload = await searchProducts(normalizedQuery, controller.signal, {
+      const exampleResult = !demo && !accept ? findCatalogueExample(normalizedQuery) : null;
+      const payload = exampleResult ?? await searchProducts(normalizedQuery, controller.signal, {
         active_filters: fresh ? null : result?.applied_filters ?? null,
         demo_catalogue: demo,
         accept_relaxation: accept,
       });
       if (activeRequest.current === controller) {
         setDemoCatalogue(demo);
-        setResult(payload);
+        setResult(visibleSearchResult(payload));
       }
     } catch (requestError) {
       if (requestError.name !== "AbortError") {
@@ -192,15 +187,15 @@ export default function App() {
               </div>
               <button className="clear-button" type="button" onClick={clearSearch}>Clear search</button>
             </div>
-            <FilterSummary filters={result.applied_filters} />
+            {!result.clarification && <FilterSummary filters={result.applied_filters} />}
 
-            {result.count > 0 ? (
+            {!result.clarification && (result.count > 0 ? (
               <ProductGrid products={result.products} />
             ) : (
               <div className="state-card empty-state">
                 <span aria-hidden="true">⌕</span>
                 <div>
-                  <strong>{result.clarification ? "Search unchanged" : "0 exact matches"}</strong>
+                  <strong>0 exact matches</strong>
                   {result.relaxation_offer ? (
                     <button type="button" className="example-chip"
                       onClick={() => runSearch("Yes, apply the offered budget change", { accept: true })}>
@@ -209,7 +204,7 @@ export default function App() {
                   ) : <p>Try changing a filter or starting over.</p>}
                 </div>
               </div>
-            )}
+            ))}
           </>
         )}
 
