@@ -5,12 +5,12 @@ import ChatInput from "./components/ChatInput";
 import FilterSummary from "./components/FilterSummary";
 import ProductGrid from "./components/ProductGrid";
 
-const DEMO_START = "Find a black waterproof jacket under $150";
+const DEMO_START = "Find a black waterproof jacket under $150.";
 const DEMO_FOLLOW_UPS = [
-  "Make that under $100",
-  "Any colour is fine",
-  "Only show size XL",
-  "Okay, go up to $130",
+  "Make that under $100.",
+  "Any colour is fine.",
+  "Only show size XL.",
+  "Okay, go up to $130.",
 ];
 
 const EXAMPLE_QUERIES = [
