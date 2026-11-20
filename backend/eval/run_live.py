@@ -5,7 +5,7 @@ from collections import defaultdict
 import json
 import math
 from pathlib import Path
-from time import perf_counter
+from time import perf_counter, sleep
 
 import httpx
 
@@ -22,9 +22,13 @@ def main():
     parser.add_argument("base_url")
     parser.add_argument("--runs", type=int, default=5)
     parser.add_argument("--case")
+    parser.add_argument("--turn-delay", type=float, default=0,
+                        help="Seconds to wait between API requests, excluded from latency.")
     args = parser.parse_args()
     if args.runs < 1:
         parser.error("--runs must be positive")
+    if not math.isfinite(args.turn_delay) or args.turn_delay < 0:
+        parser.error("--turn-delay must be finite and non-negative")
     cases = json.loads(Path(__file__).with_name("conversations.json").read_text())
     if args.case:
         if args.case not in cases:
@@ -41,6 +45,8 @@ def main():
                 state = None
                 case_passed = True
                 for index, turn in enumerate(turns):
+                    if totals["attempted_turns"] and args.turn_delay:
+                        sleep(args.turn_delay)
                     totals["attempted_turns"] += 1
                     started = perf_counter()
                     try:
