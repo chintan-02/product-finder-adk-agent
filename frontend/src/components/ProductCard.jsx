@@ -9,16 +9,21 @@ const cataloguePhotos = {
   8: "denim-jacket",
   9: "apples",
   12: "brown-rice",
+  100: "trail-jacket",
+  101: "ridge-jacket",
+  102: "summit-jacket",
+  103: "coast-jacket",
 };
 
 export default function ProductCard({ product }) {
+  const isGrocery = browseCategory(product) === "groceries";
   const photo = cataloguePhotos[product.id];
   const [imageFailed, setImageFailed] = useState(false);
 
   return (
     <article className="product-card">
-      <div className="product-image-wrap">
-        {imageFailed || product.color ? (
+      <div className={isGrocery ? "product-image-wrap product-image-wrap--grocery" : "product-image-wrap"}>
+        {imageFailed || (!photo && product.color) ? (
           <div className="image-fallback" role="img" aria-label={`${product.name} image unavailable`}>
             <span aria-hidden="true">◇</span>
             <small>{product.color ? "Sample product" : "Image unavailable"}</small>
@@ -27,8 +32,9 @@ export default function ProductCard({ product }) {
           <img
             className="product-image"
             src={photo ? `/catalogue/${photo}.webp` : product.image}
-            alt={product.name}
+            alt={product.color && photo ? `${product.name} illustration` : product.name}
             loading="lazy"
+            decoding="async"
             onError={() => setImageFailed(true)}
           />
         )}

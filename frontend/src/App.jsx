@@ -42,11 +42,30 @@ export default function App() {
 
     try {
       const exampleResult = !demo && !accept ? findCatalogueExample(normalizedQuery) : null;
-      const payload = exampleResult ?? await searchProducts(normalizedQuery, controller.signal, {
+      const options = {
         active_filters: fresh ? null : result?.applied_filters ?? null,
         demo_catalogue: demo,
         accept_relaxation: accept,
-      });
+      };
+      let payload = exampleResult ?? await searchProducts(normalizedQuery, controller.signal, options);
+      const previousFilters = options.active_filters;
+      if (demo && previousFilters && /^any colou?r is fine[.!]?$/i.test(normalizedQuery)) {
+        const preservesFilters = (candidate) =>
+          !candidate.clarification && candidate.applied_filters.color == null && Object.entries(previousFilters).every(([field, value]) =>
+            field === "color" ||
+              (candidate.applied_filters[field] ?? null) === (value ?? null),
+          );
+        if (!preservesFilters(payload)) {
+          payload = await searchProducts(
+            "Remove only the colour filter. Keep every other active filter unchanged.",
+            controller.signal,
+            options,
+          );
+          if (!preservesFilters(payload)) {
+            throw new Error("The colour change could not be confirmed. Your previous filters are saved. Try again.");
+          }
+        }
+      }
       if (activeRequest.current === controller) {
         setDemoCatalogue(demo);
         setResult(visibleSearchResult(payload));
