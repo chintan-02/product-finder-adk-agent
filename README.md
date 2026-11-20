@@ -12,7 +12,7 @@ A lightweight, full-stack Product Finder built with one Google Agent Development
 
 The assignment implementation is complete:
 
-- The supplied 13-product catalogue is used as the only product source.
+- The original 13-product catalogue supports general searches. A separate fictional jacket catalogue powers the conversational walkthrough.
 - One Google ADK agent interprets natural-language search requests.
 - Deterministic Python code performs category and price comparisons.
 - Less-than, less-than-or-equal, greater-than, greater-than-or-equal, and exact-price operators are supported.
@@ -22,6 +22,8 @@ The assignment implementation is complete:
 - The backend is deployed to Google Cloud Run.
 - The frontend is deployed to Netlify and calls Cloud Run directly.
 - The Gemini API key is stored in Google Secret Manager and is never sent to the browser.
+
+[Portfolio case study](https://chintanpatel.dev/case-studies/product-finder-ai-agent) · [Evaluation fixtures](backend/eval/conversations.json) · [Conversational search release](https://github.com/chintan-02/product-finder-adk-agent/pull/1)
 
 ## Conversational search
 
@@ -41,7 +43,7 @@ the new message to a patch. The backend validates the merged filters and builds
 cards from catalogue data. An omitted filter is preserved, an explicit clear
 removes it, and reset starts fresh. The budget offer is the lowest price that
 restores a match while preserving the other filters. Applying it requires
-confirmation. The API has no shared conversation storage between requests.
+confirmation. The storefront also checks that clearing colour preserves the other filters and retries once if the model changes one. The API has no shared conversation storage between requests.
 
 The original catalogue keeps its strict price operators. The sample jacket
 walkthrough treats the stated budget as an inclusive cap. Sample listings
@@ -52,7 +54,7 @@ are fictional and independent of the original catalogue.
 ```bash
 python -m unittest discover -s backend/tests -v
 python -m backend.eval.run_live http://localhost:8000 --runs 5
-python -m backend.eval.run_live https://product-finder-api-688514789228.us-west1.run.app --case walkthrough --runs 5
+python -m backend.eval.run_live https://product-finder-api-688514789228.us-west1.run.app --case walkthrough --runs 5 --turn-delay 8
 ```
 
 Local checks passed 49 tests, including 15 scripted conversations through
@@ -60,20 +62,20 @@ the real ADK runner with a scripted model, plus simultaneous search isolation.
 The frontend production build passed. The live evaluator uses the deployed
 model and reports filter, result and clarification checks, filter compliance
 of the returned cards, first-turn and follow-up p50/p95 latency, and failing
-turns. Live Gemini results are pending deployment of the conversational API.
+turns.
+
+The hosted walkthrough passed **5 of 5 conversations and 25 of 25 turns** with eight-second spacing. All **35 returned product matches** met the expected filters, including repeat appearances across turns. From Cloud Shell, first-turn p50/p95 was **791/967 ms** and follow-up p50/p95 was **606/1,184 ms** in that run. These are scripted observations on the sample catalogue. Earlier unpaced tests hit Gemini’s free-tier rate limit. The production browser walkthrough also passed.
 
 ## Architecture
 
-```text
-User
-  -> React/Vite frontend on Netlify
-  -> POST /api/v1/chat on Cloud Run
-  -> FastAPI boundary and request validation
-  -> one Google ADK product_finder_agent
-  -> find_products structured function tool
-  -> deterministic Python filtering
-  -> supplied products.json or explicit sample jacket catalogue
-  -> structured result returned to React product cards
+```mermaid
+flowchart TD
+  UI["React on Netlify"] -->|Free-form search and current filters| API["FastAPI on Cloud Run"]
+  UI -->|Fixed example| Preset["Browser-side catalogue filters"]
+  API --> ADK["Google ADK and Gemini"]
+  ADK -->|Structured filter change| Filter["Validated Python catalogue search"]
+  Filter -->|Matches, filters, and budget offer| UI
+  Preset -->|Matches and filters| UI
 ```
 
 ### Deterministic boundary
@@ -92,15 +94,15 @@ The LLM does not compare prices, filter the catalogue, or invent product facts. 
 
 This separation keeps natural-language interpretation flexible while making the returned catalogue results predictable and testable.
 
-## Required examples
+## Storefront examples
 
 | Query | Expected result |
 |---|---:|
-| `Show me all your clothing products.` | 4 products |
-| `What clothing items are available under $50?` | 2 products |
+| `Show all clothing products` | 3 products. The storefront displays running shoes as footwear. |
+| `Groceries at most $5` | 3 products |
 | `Electronics over $200` | 2 products |
 | `Products exactly $49` | 1 product |
-| `Show furniture` | 0 products |
+
 
 ## Technology stack
 
